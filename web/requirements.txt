@@ -1,0 +1,4 @@
+flask>=2.2.2
+flask-sqlalchemy>=3.0.0
+psycopg2>=2.9.4
+gunicorn>=20.1.0

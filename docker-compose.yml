@@ -1,0 +1,40 @@
+version: '3.7'
+
+services:
+  nginx:
+    restart: always
+    build: ./nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./web/static:/static
+    links:
+      - web:web
+
+  web:
+    restart: always
+    build: ./web
+    links:
+      - postgres:postgres
+    env_file:
+      - .env
+    expose:
+      - "8000"
+    depends_on:
+      - postgres
+    command: >
+      sh -c "python3 ./create_db.py &&
+             gunicorn -w 2 -b :8000 app:app"
+
+  postgres:
+    restart: always
+    image: postgres:latest
+    volumes:
+      - db-data:/var/lib/postgresql
+    env_file:
+      - .env
+    expose:
+      - "5432"
+
+volumes:
+  db-data:
