@@ -1,5 +1,11 @@
 version: '3.7'
 
+secrets:
+  postgres_user:
+    file: ./secrets/postgres_user.txt
+  postgres_password:
+    file: ./secrets/postgres_password.txt
+
 services:
   nginx:
     restart: always
@@ -16,8 +22,15 @@ services:
     build: ./web
     links:
       - postgres:postgres
-    env_file:
-      - .env
+    secrets:
+      - postgres_user
+      - postgres_password
+    environment:
+      DEBUG: False
+      POSTGRES_DB: db
+      DATABASE_PORT: 5432
+      POSTGRES_USER_FILE: /run/secrets/postgres_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
     expose:
       - "8000"
     depends_on:
@@ -31,8 +44,13 @@ services:
     image: postgres:latest
     volumes:
       - db-data:/var/lib/postgresql
-    env_file:
-      - .env
+    secrets:
+      - postgres_user
+      - postgres_password
+    environment:
+      POSTGRES_DB: db
+      POSTGRES_USER_FILE: /run/secrets/postgres_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
     expose:
       - "5432"
 
